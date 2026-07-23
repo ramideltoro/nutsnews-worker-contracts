@@ -1,9 +1,11 @@
 export * from "./envelope.js";
+export * from "./fixtures.js";
+export * from "./payloads.js";
 export * from "./topology.js";
 
 export const CONTRACT_PACKAGE_NAME = "@ramideltoro/nutsnews-worker-contracts" as const;
-export const CONTRACT_PACKAGE_VERSION = "0.2.0" as const;
-export const CONTRACT_PACKAGE_STATUS = "topology-envelope" as const;
+export const CONTRACT_PACKAGE_VERSION = "0.3.0" as const;
+export const CONTRACT_PACKAGE_STATUS = "payload-schemas" as const;
 
 export const CONTRACT_COMPATIBILITY_POLICY = {
   semver:
@@ -15,12 +17,11 @@ export const CONTRACT_COMPATIBILITY_POLICY = {
 } as const;
 
 export const AVAILABLE_CONTRACT_SURFACES = [
-  "rabbitmq-topology-and-message-envelope"
-] as const;
-
-export const PLANNED_CONTRACT_SURFACES = [
+  "rabbitmq-topology-and-message-envelope",
   "stage-payload-schemas-and-fixtures"
 ] as const;
+
+export const PLANNED_CONTRACT_SURFACES = [] as const;
 
 export type ContractPackageStatus = typeof CONTRACT_PACKAGE_STATUS;
 export type AvailableContractSurface = (typeof AVAILABLE_CONTRACT_SURFACES)[number];
