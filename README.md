@@ -6,7 +6,7 @@ Versioned worker-uplift contract package for NutsNews services.
 
 Own versioned RabbitMQ exchanges, routing keys, queue names, retry/DLQ names, message schemas, and fixtures for the worker-uplift pipeline.
 
-Version `0.3.0` defines the RabbitMQ topology, common message envelope, stage payload schemas, and sanitized parity fixtures.
+Version `0.3.1` defines the RabbitMQ topology, common message envelope, stage payload schemas, sanitized parity fixtures, and compatibility/conformance checks.
 
 ## Owner
 
@@ -21,7 +21,7 @@ GitHub Packages npm package: `@ramideltoro/nutsnews-worker-contracts`. This repo
 Consumers install exact immutable versions from GitHub Packages:
 
 ```sh
-npm install @ramideltoro/nutsnews-worker-contracts@0.3.0
+npm install @ramideltoro/nutsnews-worker-contracts@0.3.1
 ```
 
 CI consumers use the owner-scoped npm registry with a short-lived `GITHUB_TOKEN`:
@@ -55,6 +55,7 @@ import {
 
 See [docs/adr-0001-rabbitmq-topology-envelope.md](docs/adr-0001-rabbitmq-topology-envelope.md) for route ownership, retry/DLQ behavior, delivery assumptions, and validation rules.
 See [docs/adr-0002-stage-payload-schemas-fixtures.md](docs/adr-0002-stage-payload-schemas-fixtures.md) for stage payload schemas, fixtures, and producer/consumer field expectations.
+See [docs/compatibility-matrix.md](docs/compatibility-matrix.md) and [docs/package-integrity.md](docs/package-integrity.md) for supported versions, conformance, integrity verification, and rollback.
 
 ## Development
 
@@ -90,7 +91,7 @@ This repository owns its package or service implementation, CI, package or image
 
 ## Package / Image Access
 
-Downstream builds consume this package through GitHub Packages with an exact immutable version, for example `@ramideltoro/nutsnews-worker-contracts@0.3.0`, using a short-lived `GITHUB_TOKEN` and the owner-scoped npm registry.
+Downstream builds consume this package through GitHub Packages with an exact immutable version, for example `@ramideltoro/nutsnews-worker-contracts@0.3.1`, using a short-lived `GITHUB_TOKEN` and the owner-scoped npm registry.
 
 No long-lived GitHub Packages token is required for CI. Workflows use least-privilege permissions and request `packages: write` only for publish jobs.
 

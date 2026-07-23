@@ -4,6 +4,12 @@ All notable changes to `@ramideltoro/nutsnews-worker-contracts` are documented h
 
 This package follows semantic versioning. Published versions are immutable; consumers roll back by pinning a previously published version.
 
+## 0.3.1 - 2026-07-23
+
+- Add compatibility matrix metadata, conformance tests, semantic-version compatibility checks, and a frozen `0.3.0` contract snapshot.
+- Add package integrity verification script and integrity/provenance documentation for exact-version consumers.
+- Extend release policy documentation with compatibility and rollback expectations.
+
 ## 0.3.0 - 2026-07-23
 
 - Define stage payload schema IDs, producer/consumer metadata, required fields, field definitions, and service-independent payload validation.
