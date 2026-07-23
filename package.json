@@ -1,6 +1,6 @@
 {
   "name": "@ramideltoro/nutsnews-worker-contracts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Versioned worker-uplift contract package for NutsNews services.",
   "license": "MIT",
   "repository": {
@@ -34,8 +34,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
+    "compatibility:check": "node scripts/check-semver-compatibility.mjs",
     "package:check": "node scripts/validate-package.mjs",
-    "ci": "npm run lint && npm run typecheck && npm run test && npm run build && npm run package:check"
+    "ci": "npm run lint && npm run typecheck && npm run test && npm run build && npm run compatibility:check && npm run package:check"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",

@@ -11,6 +11,7 @@ const requiredScripts = [
   "typecheck",
   "lint",
   "test",
+  "compatibility:check",
   "package:check",
   "ci"
 ];
