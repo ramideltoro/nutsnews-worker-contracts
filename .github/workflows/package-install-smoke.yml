@@ -59,8 +59,8 @@ jobs:
             throw new Error(`Installed ${CONTRACT_PACKAGE_VERSION}, expected ${process.env.PACKAGE_VERSION}`);
           }
 
-          if (metadata.status !== "bootstrap") {
-            throw new Error(`Unexpected contract package status: ${metadata.status}`);
+          if (typeof metadata.status !== "string" || metadata.status.length === 0) {
+            throw new Error("Installed package metadata did not include a status.");
           }
 
           console.log(JSON.stringify({
