@@ -1,6 +1,9 @@
 node_modules/
 dist/
 coverage/
+*.tgz
+npm-debug.log*
+.eslintcache
 .env
 .env.*
 !.env.example
