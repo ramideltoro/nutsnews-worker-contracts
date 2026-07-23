@@ -24,6 +24,7 @@ Consumers must pin exact versions. Ranges such as `^1.2.3` are not part of the s
 4. Let the publish workflow run from the release event.
 5. Confirm the workflow produced an artifact attestation and published the package to GitHub Packages.
 6. Confirm a fresh consumer install can resolve the exact published version through the `@ramideltoro` GitHub Packages scope.
+7. Run the `Package Install Smoke` workflow with the exact published version and confirm it installs and imports the package using repository `GITHUB_TOKEN` package-read permissions.
 
 Manual `workflow_dispatch` publish runs are allowed only for rerunning the same source version after an infrastructure failure before the version has been published.
 
