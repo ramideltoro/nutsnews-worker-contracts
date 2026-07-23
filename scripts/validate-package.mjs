@@ -31,16 +31,13 @@ const forbiddenSourcePatterns = [
   /\.\.\/worker/u,
   /legacy-worker/u
 ];
-const allowedPackedFiles = [
+const requiredPackedRootFiles = [
   "CHANGELOG.md",
   "LICENSE",
   "README.md",
-  "dist/index.d.ts",
-  "dist/index.d.ts.map",
-  "dist/index.js",
-  "dist/index.js.map",
   "package.json"
 ];
+const allowedPackedRootFiles = new Set(requiredPackedRootFiles);
 
 function assert(condition, message) {
   if (!condition) {
@@ -145,14 +142,17 @@ function assertPackedContents() {
   });
   const [packResult] = JSON.parse(packOutput);
   const files = packResult.files.map((entry) => entry.path).sort();
+  const requiredPackedFiles = [
+    ...requiredPackedRootFiles,
+    ...expectedBuildOutputFiles()
+  ].sort();
 
-  assert(files.length === allowedPackedFiles.length, `unexpected packed file count: ${files.join(", ")}`);
-
-  for (const file of allowedPackedFiles) {
+  for (const file of requiredPackedFiles) {
     assert(files.includes(file), `packed tarball is missing ${file}`);
   }
 
   for (const file of files) {
+    assert(file.startsWith("dist/") || allowedPackedRootFiles.has(file), `unexpected packed file: ${file}`);
     assert(!file.startsWith(".github/"), "packed tarball must not include GitHub workflow files");
     assert(!file.startsWith("src/"), "packed tarball must not include TypeScript source");
     assert(!file.startsWith("test/"), "packed tarball must not include tests");
@@ -161,9 +161,24 @@ function assertPackedContents() {
 }
 
 function assertGeneratedEntriesExist() {
-  for (const file of allowedPackedFiles.filter((entry) => entry.startsWith("dist/"))) {
+  for (const file of expectedBuildOutputFiles()) {
     assert(statSync(join(root, file)).isFile(), `build output missing ${file}`);
   }
+}
+
+function expectedBuildOutputFiles() {
+  return walkFiles(join(root, "src"))
+    .filter((file) => file.startsWith("src/") && file.endsWith(".ts"))
+    .flatMap((file) => {
+      const relativeOutput = file.slice("src/".length, -".ts".length);
+
+      return [
+        `dist/${relativeOutput}.d.ts`,
+        `dist/${relativeOutput}.d.ts.map`,
+        `dist/${relativeOutput}.js`,
+        `dist/${relativeOutput}.js.map`
+      ];
+    });
 }
 
 assertPackageMetadata();
