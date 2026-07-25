@@ -25,7 +25,8 @@ describe("contract conformance and compatibility", () => {
 
     expect(compatibleVersions).toEqual(expect.arrayContaining([
       "0.3.0",
-      "0.3.1"
+      "0.3.1",
+      "0.4.0"
     ]));
 
     for (const version of compatibleVersions) {

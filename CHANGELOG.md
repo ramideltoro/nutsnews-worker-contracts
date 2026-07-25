@@ -4,6 +4,12 @@ All notable changes to `@ramideltoro/nutsnews-worker-contracts` are documented h
 
 This package follows semantic versioning. Published versions are immutable; consumers roll back by pinning a previously published version.
 
+## 0.4.0 - 2026-07-25
+
+- Add `enrichmentRequest`, a canonicalizer-to-enrichment payload schema on the `enrichment` stage for new or materially changed canonical article identities.
+- Add sanitized fixtures and validation coverage for new and changed enrichment requests.
+- Update compatibility metadata and documentation for the `0.4.0` contract release.
+
 ## 0.3.1 - 2026-07-23
 
 - Add compatibility matrix metadata, conformance tests, semantic-version compatibility checks, and a frozen `0.3.0` contract snapshot.

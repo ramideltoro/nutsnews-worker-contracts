@@ -82,6 +82,30 @@ export const STAGE_PAYLOAD_FIXTURES = [
     dedupeStatus: "duplicate",
     duplicateOfArticleId: "article-existing-001"
   })),
+  fixture("enrichment-request-new", "service-input-output", "Canonicalizer requests page enrichment by canonical article ID and durable metadata reference only.", payload(STAGE_PAYLOAD_SCHEMA_IDS.enrichmentRequest, {
+    requestId: "enrichment-req-001",
+    canonicalArticleId: "article-001",
+    articleVersion: 1,
+    candidateId: "cand-001",
+    canonicalUrl: "https://articles.example.test/world/story-001",
+    reason: "new",
+    payloadRef: {
+      kind: "backend-record",
+      id: "canonical-identity-001"
+    }
+  })),
+  fixture("enrichment-request-changed", "service-input-output", "Materially changed canonical articles can request enrichment for a new version without losing identity history.", payload(STAGE_PAYLOAD_SCHEMA_IDS.enrichmentRequest, {
+    requestId: "enrichment-req-002",
+    canonicalArticleId: "article-001",
+    articleVersion: 2,
+    candidateId: "cand-001-version-002",
+    canonicalUrl: "https://articles.example.test/world/story-001",
+    reason: "changed",
+    payloadRef: {
+      kind: "backend-record",
+      id: "canonical-identity-002"
+    }
+  })),
   fixture("enrichment-result-success", "service-input-output", "Image hydration keeps durable metadata references and selected image URL only.", payload(STAGE_PAYLOAD_SCHEMA_IDS.enrichmentResult, {
     candidateId: "cand-001",
     canonicalUrl: "https://articles.example.test/world/story-001",

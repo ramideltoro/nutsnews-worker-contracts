@@ -9,6 +9,7 @@ export const STAGE_PAYLOAD_SCHEMA_IDS = {
   feedFetchRequest: "nutsnews.worker.payload.feed-fetch-request.v1",
   feedFetchResult: "nutsnews.worker.payload.feed-fetch-result.v1",
   canonicalArticleCandidate: "nutsnews.worker.payload.canonical-article-candidate.v1",
+  enrichmentRequest: "nutsnews.worker.payload.enrichment-request.v1",
   enrichmentResult: "nutsnews.worker.payload.enrichment-result.v1",
   approvalDecision: "nutsnews.worker.payload.approval-decision.v1",
   translationTask: "nutsnews.worker.payload.translation-task.v1",
@@ -218,6 +219,26 @@ export const STAGE_PAYLOAD_SCHEMA_DEFINITIONS = {
       "duplicate"
     ]),
     duplicateOfArticleId: stringField("Existing article identifier for duplicates.")
+  }),
+  [STAGE_PAYLOAD_SCHEMA_IDS.enrichmentRequest]: schema(STAGE_PAYLOAD_SCHEMA_IDS.enrichmentRequest, "enrichment", "canonicalizer", "enrichment", "Request article-page enrichment for a canonical article identity without carrying page body.", [
+    "requestId",
+    "canonicalArticleId",
+    "articleVersion",
+    "candidateId",
+    "canonicalUrl",
+    "reason",
+    "payloadRef"
+  ], {
+    requestId: stringField("Stable enrichment request identifier."),
+    canonicalArticleId: stringField("Canonical article identity assigned by the canonicalizer."),
+    articleVersion: positiveIntegerField("Canonical article version to enrich."),
+    candidateId: stringField("Source candidate that triggered this enrichment request."),
+    canonicalUrl: urlField("Canonical article URL to fetch under enrichment network policy."),
+    reason: enumField("Reason enrichment work is requested.", [
+      "new",
+      "changed"
+    ]),
+    payloadRef: objectField("Durable reference to canonicalizer-owned identity and material-fingerprint metadata.")
   }),
   [STAGE_PAYLOAD_SCHEMA_IDS.enrichmentResult]: schema(STAGE_PAYLOAD_SCHEMA_IDS.enrichmentResult, "enrichment", "enrichment", "approval", "Carry image/article-page enrichment metadata by reference.", [
     "candidateId",

@@ -76,6 +76,52 @@ describe("stage payload schemas and fixtures", () => {
     }
   });
 
+  it("defines a canonicalizer-to-enrichment request payload on the enrichment stage", () => {
+    const definition = STAGE_PAYLOAD_SCHEMA_DEFINITIONS[STAGE_PAYLOAD_SCHEMA_IDS.enrichmentRequest];
+    const fixture = STAGE_PAYLOAD_FIXTURES.find((candidate) => candidate.name === "enrichment-request-new");
+
+    expect(definition).toMatchObject({
+      stage: "enrichment",
+      producer: "canonicalizer",
+      consumer: "enrichment"
+    });
+    expect(definition.requiredFields).toEqual(expect.arrayContaining([
+      "requestId",
+      "canonicalArticleId",
+      "articleVersion",
+      "candidateId",
+      "canonicalUrl",
+      "reason",
+      "payloadRef"
+    ]));
+    expect(fixture).toBeDefined();
+
+    if (fixture !== undefined) {
+      const result = validateStagePayload(fixture.payload);
+
+      expect(result).toMatchObject({
+        ok: true
+      });
+      expect(result.ok ? result.definition.stage : undefined).toBe("enrichment");
+    }
+  });
+
+  it("rejects invalid enrichment request reasons", () => {
+    const fixture = STAGE_PAYLOAD_FIXTURES.find((candidate) => candidate.name === "enrichment-request-new");
+
+    expect(fixture).toBeDefined();
+    if (fixture === undefined) {
+      throw new Error("missing enrichment-request-new fixture");
+    }
+
+    const result = validateStagePayload({
+      ...fixture.payload,
+      reason: "duplicate"
+    });
+
+    expect(issueCodes(result)).toContain("invalid-field");
+  });
+
   it("rejects unknown fields that would inline article or model bodies", () => {
     const fixture = STAGE_PAYLOAD_FIXTURES[0];
 

@@ -5,7 +5,7 @@ export * from "./payloads.js";
 export * from "./topology.js";
 
 export const CONTRACT_PACKAGE_NAME = "@ramideltoro/nutsnews-worker-contracts" as const;
-export const CONTRACT_PACKAGE_VERSION = "0.3.1" as const;
+export const CONTRACT_PACKAGE_VERSION = "0.4.0" as const;
 export const CONTRACT_PACKAGE_STATUS = "compatibility-conformance" as const;
 
 export const CONTRACT_COMPATIBILITY_POLICY = {
