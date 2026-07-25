@@ -8,6 +8,7 @@ Deprecation window: `90` days from release unless a security response explicitly
 | `0.2.0` | supported | `2026-10-21` | bootstrap metadata; RabbitMQ topology and envelope | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.2.0 |
 | `0.3.0` | supported | `2026-10-21` | bootstrap metadata; RabbitMQ topology and envelope; stage payload schemas and fixtures | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.3.0 |
 | `0.3.1` | supported | `2026-10-21` | bootstrap metadata; RabbitMQ topology and envelope; stage payload schemas and fixtures; compatibility and conformance tooling | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.3.1 |
+| `0.4.0` | supported | `2026-10-23` | bootstrap metadata; RabbitMQ topology and envelope; stage payload schemas and fixtures; compatibility and conformance tooling | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.4.0 |
 
 ## Compatibility Rules
 
