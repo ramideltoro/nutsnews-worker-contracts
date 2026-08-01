@@ -105,6 +105,25 @@ export const CONTRACT_COMPATIBILITY_MATRIX = [
     ],
     commit: "resolved-by-release-tag",
     releaseUrl: "https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.4.0"
+  },
+  {
+    version: "1.0.0",
+    status: "supported",
+    releasedAt: "2026-08-01",
+    supportedUntil: "2026-10-30",
+    surfaces: [
+      "bootstrap-metadata",
+      "rabbitmq-topology-and-message-envelope",
+      "stage-payload-schemas-and-fixtures",
+      "compatibility-and-conformance"
+    ],
+    fixtureSuites: [
+      CONTRACT_FIXTURE_SUITES.bootstrap,
+      CONTRACT_FIXTURE_SUITES.topologyEnvelope,
+      CONTRACT_FIXTURE_SUITES.stagePayloads
+    ],
+    commit: "resolved-by-release-tag",
+    releaseUrl: "https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v1.0.0"
   }
 ] as const satisfies readonly ContractCompatibilityMatrixEntry[];
 

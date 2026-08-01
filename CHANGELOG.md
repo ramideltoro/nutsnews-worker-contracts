@@ -4,6 +4,14 @@ All notable changes to `@ramideltoro/nutsnews-worker-contracts` are documented h
 
 This package follows semantic versioning. Published versions are immutable; consumers roll back by pinning a previously published version.
 
+## 1.0.0 - 2026-08-01
+
+- Correct `canonicalArticleCandidate` ownership from `canonicalizer`/`enrichment` to the deployed `fetcher`/`canonicalizer` boundary.
+- Add a fetcher-shaped canonical candidate fixture and conformance coverage for runtime consumer validation.
+- Freeze normalized compatibility metadata for the schema version, required fields, field types, enum values, and effective byte limits, with mutation tests that reject incompatible `1.x` changes.
+- Install CI and publish dependencies with lifecycle scripts disabled, and refresh the development lockfile to patched `brace-expansion` releases.
+- Document the required contracts-first migration for consumers that validate payload ownership.
+
 ## 0.4.0 - 2026-07-25
 
 - Add `enrichmentRequest`, a canonicalizer-to-enrichment payload schema on the `enrichment` stage for new or materially changed canonical article identities.

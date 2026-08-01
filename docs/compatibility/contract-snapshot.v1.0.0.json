@@ -1,0 +1,1514 @@
+{
+  "snapshotVersion": 2,
+  "baselinePackageVersion": "1.0.0",
+  "capturedAtUtc": "2026-08-01T00:00:00.000Z",
+  "stagePayloadSchemaVersion": 1,
+  "payloadConstraints": {
+    "maxSerializedPayloadBytes": 16384
+  },
+  "topology": {
+    "routes": [
+      {
+        "stage": "fetch",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "scheduler",
+        "consumer": "fetcher",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.fetch.v1",
+        "mainQueue": "nutsnews.worker.fetch.v1",
+        "retryQueues": [
+          "nutsnews.worker.fetch.v1.retry-30s",
+          "nutsnews.worker.fetch.v1.retry-5m",
+          "nutsnews.worker.fetch.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.fetch.v1.dlq"
+      },
+      {
+        "stage": "canonicalization",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "fetcher",
+        "consumer": "canonicalizer",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.canonicalization.v1",
+        "mainQueue": "nutsnews.worker.canonicalization.v1",
+        "retryQueues": [
+          "nutsnews.worker.canonicalization.v1.retry-30s",
+          "nutsnews.worker.canonicalization.v1.retry-5m",
+          "nutsnews.worker.canonicalization.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.canonicalization.v1.dlq"
+      },
+      {
+        "stage": "enrichment",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "canonicalizer",
+        "consumer": "enrichment",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.enrichment.v1",
+        "mainQueue": "nutsnews.worker.enrichment.v1",
+        "retryQueues": [
+          "nutsnews.worker.enrichment.v1.retry-30s",
+          "nutsnews.worker.enrichment.v1.retry-5m",
+          "nutsnews.worker.enrichment.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.enrichment.v1.dlq"
+      },
+      {
+        "stage": "approval",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "enrichment",
+        "consumer": "approval",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.approval.v1",
+        "mainQueue": "nutsnews.worker.approval.v1",
+        "retryQueues": [
+          "nutsnews.worker.approval.v1.retry-30s",
+          "nutsnews.worker.approval.v1.retry-5m",
+          "nutsnews.worker.approval.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.approval.v1.dlq"
+      },
+      {
+        "stage": "translation",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "approval",
+        "consumer": "translation",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.translation.v1",
+        "mainQueue": "nutsnews.worker.translation.v1",
+        "retryQueues": [
+          "nutsnews.worker.translation.v1.retry-30s",
+          "nutsnews.worker.translation.v1.retry-5m",
+          "nutsnews.worker.translation.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.translation.v1.dlq"
+      },
+      {
+        "stage": "persistence",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "translation",
+        "consumer": "persistence",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.persistence.v1",
+        "mainQueue": "nutsnews.worker.persistence.v1",
+        "retryQueues": [
+          "nutsnews.worker.persistence.v1.retry-30s",
+          "nutsnews.worker.persistence.v1.retry-5m",
+          "nutsnews.worker.persistence.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.persistence.v1.dlq"
+      },
+      {
+        "stage": "publication",
+        "schemaId": "nutsnews.worker.envelope.v1",
+        "producer": "persistence",
+        "consumer": "publication",
+        "exchange": "nutsnews.worker.v1",
+        "routingKey": "nutsnews.worker.publication.v1",
+        "mainQueue": "nutsnews.worker.publication.v1",
+        "retryQueues": [
+          "nutsnews.worker.publication.v1.retry-30s",
+          "nutsnews.worker.publication.v1.retry-5m",
+          "nutsnews.worker.publication.v1.retry-30m"
+        ],
+        "terminalDlq": "nutsnews.worker.publication.v1.dlq"
+      }
+    ],
+    "retryTiers": [
+      {
+        "name": "retry-30s",
+        "delayMs": 30000
+      },
+      {
+        "name": "retry-5m",
+        "delayMs": 300000
+      },
+      {
+        "name": "retry-30m",
+        "delayMs": 1800000
+      }
+    ]
+  },
+  "payloadSchemas": {
+    "nutsnews.worker.payload.approval-decision.v1": {
+      "stage": "approval",
+      "producer": "approval",
+      "consumer": "translation",
+      "requiredFields": [
+        "candidateId",
+        "decision",
+        "idempotencyKey",
+        "model",
+        "pipelineRunId",
+        "producedAt",
+        "provider",
+        "reviewRef",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "aiUsageRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "candidateId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "decision": {
+          "type": "enum",
+          "values": [
+            "accepted",
+            "permanent_failure",
+            "rejected",
+            "transient_failure"
+          ],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "model": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "positivityScore": {
+          "type": "integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "provider": {
+          "type": "enum",
+          "values": [
+            "legacy_openai_fallback",
+            "local_ai",
+            "prefilter"
+          ],
+          "maxBytes": null
+        },
+        "rejectionReason": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "reviewRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.canonical-article-candidate.v1": {
+      "stage": "canonicalization",
+      "producer": "fetcher",
+      "consumer": "canonicalizer",
+      "requiredFields": [
+        "candidateId",
+        "canonicalUrl",
+        "dedupeStatus",
+        "feedId",
+        "idempotencyKey",
+        "originalUrl",
+        "pipelineRunId",
+        "producedAt",
+        "schemaId",
+        "schemaVersion",
+        "sourceItemId",
+        "sourceMessageId",
+        "sourceName",
+        "stageExecutionId",
+        "title",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "candidateId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "canonicalUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "dedupeStatus": {
+          "type": "enum",
+          "values": [
+            "duplicate",
+            "new"
+          ],
+          "maxBytes": null
+        },
+        "duplicateOfArticleId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "feedId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "originalUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "publishedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceItemId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceName": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "title": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.enrichment-request.v1": {
+      "stage": "enrichment",
+      "producer": "canonicalizer",
+      "consumer": "enrichment",
+      "requiredFields": [
+        "articleVersion",
+        "candidateId",
+        "canonicalArticleId",
+        "canonicalUrl",
+        "idempotencyKey",
+        "payloadRef",
+        "pipelineRunId",
+        "producedAt",
+        "reason",
+        "requestId",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "articleVersion": {
+          "type": "positive-integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "candidateId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "canonicalArticleId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "canonicalUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "payloadRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "reason": {
+          "type": "enum",
+          "values": [
+            "changed",
+            "new"
+          ],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "requestId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.enrichment-result.v1": {
+      "stage": "enrichment",
+      "producer": "enrichment",
+      "consumer": "approval",
+      "requiredFields": [
+        "articleMetadataRef",
+        "candidateId",
+        "canonicalUrl",
+        "idempotencyKey",
+        "imageStatus",
+        "pipelineRunId",
+        "producedAt",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "articleMetadataRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "candidateId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "canonicalUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "imageStatus": {
+          "type": "enum",
+          "values": [
+            "hydrated",
+            "no_thumbnail",
+            "transient_failure"
+          ],
+          "maxBytes": null
+        },
+        "imageUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "retryAfterSeconds": {
+          "type": "integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.feed-fetch-request.v1": {
+      "stage": "fetch",
+      "producer": "scheduler",
+      "consumer": "fetcher",
+      "requiredFields": [
+        "feedId",
+        "feedUrl",
+        "fetchReason",
+        "idempotencyKey",
+        "limits",
+        "pipelineRunId",
+        "producedAt",
+        "schemaId",
+        "schemaVersion",
+        "shardCount",
+        "shardIndex",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "conditional": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "feedId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "feedUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "fetchReason": {
+          "type": "enum",
+          "values": [
+            "backlog",
+            "manual",
+            "replay",
+            "scheduled"
+          ],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "limits": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "shardCount": {
+          "type": "positive-integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "shardIndex": {
+          "type": "integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.feed-fetch-result.v1": {
+      "stage": "fetch",
+      "producer": "fetcher",
+      "consumer": "canonicalizer",
+      "requiredFields": [
+        "feedId",
+        "feedUrl",
+        "fetchStatus",
+        "idempotencyKey",
+        "itemRefs",
+        "pipelineRunId",
+        "producedAt",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "errorRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "etag": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "feedId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "feedUrl": {
+          "type": "url",
+          "values": [],
+          "maxBytes": 2048
+        },
+        "fetchStatus": {
+          "type": "enum",
+          "values": [
+            "permanent_failure",
+            "success",
+            "transient_failure",
+            "unchanged"
+          ],
+          "maxBytes": null
+        },
+        "httpStatus": {
+          "type": "integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "itemRefs": {
+          "type": "object-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "lastModified": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "unchangedReason": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.persistence-command.v1": {
+      "stage": "persistence",
+      "producer": "persistence",
+      "consumer": "persistence",
+      "requiredFields": [
+        "backendOperation",
+        "commandId",
+        "commandKind",
+        "entityRefs",
+        "idempotencyKey",
+        "pipelineRunId",
+        "producedAt",
+        "providerMode",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent",
+        "writeMode"
+      ],
+      "fieldDefinitions": {
+        "backendOperation": {
+          "type": "enum",
+          "values": [
+            "save-accepted-articles-batch",
+            "save-ai-usage-run",
+            "save-article-reviews-batch",
+            "save-article-summaries-batch",
+            "save-feed-health-batch",
+            "save-worker-run"
+          ],
+          "maxBytes": null
+        },
+        "commandId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "commandKind": {
+          "type": "enum",
+          "values": [
+            "save_article",
+            "save_feed_health",
+            "save_review",
+            "save_summaries",
+            "save_worker_run"
+          ],
+          "maxBytes": null
+        },
+        "entityRefs": {
+          "type": "object-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "providerMode": {
+          "type": "enum",
+          "values": [
+            "backend_postgres_primary"
+          ],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "writeMode": {
+          "type": "enum",
+          "values": [
+            "insert_on_conflict_do_nothing",
+            "upsert"
+          ],
+          "maxBytes": null
+        }
+      }
+    },
+    "nutsnews.worker.payload.persistence-result.v1": {
+      "stage": "persistence",
+      "producer": "persistence",
+      "consumer": "publication",
+      "requiredFields": [
+        "backendOperation",
+        "commandId",
+        "idempotencyKey",
+        "persistenceStatus",
+        "pipelineRunId",
+        "producedAt",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "backendOperation": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "commandId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "duplicateOf": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "errorRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "persistenceStatus": {
+          "type": "enum",
+          "values": [
+            "duplicate",
+            "permanent_failure",
+            "rejected",
+            "saved",
+            "transient_failure"
+          ],
+          "maxBytes": null
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "savedEntityRefs": {
+          "type": "object-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.publication-readiness.v1": {
+      "stage": "publication",
+      "producer": "publication",
+      "consumer": "publication",
+      "requiredFields": [
+        "articleId",
+        "availableLanguageCodes",
+        "idempotencyKey",
+        "missingLanguageCodes",
+        "pipelineRunId",
+        "producedAt",
+        "readinessStatus",
+        "requiredLanguageCodes",
+        "schemaId",
+        "schemaVersion",
+        "snapshotRefreshRequired",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "articleId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "availableLanguageCodes": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "missingLanguageCodes": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "publicationRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "readinessStatus": {
+          "type": "enum",
+          "values": [
+            "blocked_missing_translations",
+            "published",
+            "ready"
+          ],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "requiredLanguageCodes": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "snapshotRefreshRequired": {
+          "type": "boolean",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.terminal-failure.v1": {
+      "stage": "terminal",
+      "producer": "any-stage-consumer",
+      "consumer": "dlq-operator",
+      "requiredFields": [
+        "errorCode",
+        "failedAttemptCount",
+        "failedMessageId",
+        "failedRoute",
+        "failedSchemaId",
+        "failureClass",
+        "idempotencyKey",
+        "originalPayloadRef",
+        "pipelineRunId",
+        "producedAt",
+        "retryExhausted",
+        "sanitizedError",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "errorCode": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "failedAttemptCount": {
+          "type": "positive-integer",
+          "values": [],
+          "maxBytes": null
+        },
+        "failedMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "failedRoute": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "failedSchemaId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "failureClass": {
+          "type": "enum",
+          "values": [
+            "malformed",
+            "oversized",
+            "permanent",
+            "stale_schema",
+            "transient_exhausted",
+            "unsupported_schema"
+          ],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "originalPayloadRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "retryExhausted": {
+          "type": "boolean",
+          "values": [],
+          "maxBytes": null
+        },
+        "sanitizedError": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    },
+    "nutsnews.worker.payload.translation-result.v1": {
+      "stage": "translation",
+      "producer": "translation",
+      "consumer": "persistence",
+      "requiredFields": [
+        "articleId",
+        "completedLanguageCodes",
+        "idempotencyKey",
+        "missingLanguageCodes",
+        "pipelineRunId",
+        "producedAt",
+        "schemaId",
+        "schemaVersion",
+        "sourceMessageId",
+        "stageExecutionId",
+        "summaryRefs",
+        "traceparent",
+        "translationStatus"
+      ],
+      "fieldDefinitions": {
+        "articleId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "completedLanguageCodes": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "failureRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "missingLanguageCodes": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "qualityRef": {
+          "type": "object",
+          "values": [],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "summaryRefs": {
+          "type": "object-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "translationStatus": {
+          "type": "enum",
+          "values": [
+            "complete",
+            "partial",
+            "permanent_failure",
+            "transient_failure"
+          ],
+          "maxBytes": null
+        }
+      }
+    },
+    "nutsnews.worker.payload.translation-task.v1": {
+      "stage": "translation",
+      "producer": "approval",
+      "consumer": "translation",
+      "requiredFields": [
+        "articleId",
+        "existingLanguageCodes",
+        "idempotencyKey",
+        "pipelineRunId",
+        "producedAt",
+        "reason",
+        "schemaId",
+        "schemaVersion",
+        "sourceLanguage",
+        "sourceMessageId",
+        "stageExecutionId",
+        "targetLanguages",
+        "traceparent"
+      ],
+      "fieldDefinitions": {
+        "articleId": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "existingLanguageCodes": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "idempotencyKey": {
+          "type": "idempotency-key",
+          "values": [],
+          "maxBytes": 256
+        },
+        "pipelineRunId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "producedAt": {
+          "type": "iso-instant",
+          "values": [],
+          "maxBytes": null
+        },
+        "reason": {
+          "type": "enum",
+          "values": [
+            "backlog_recovery",
+            "new_article",
+            "replay"
+          ],
+          "maxBytes": null
+        },
+        "replayOfMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaId": {
+          "type": "schema-id",
+          "values": [],
+          "maxBytes": null
+        },
+        "schemaVersion": {
+          "type": "schema-version",
+          "values": [],
+          "maxBytes": null
+        },
+        "sourceLanguage": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        },
+        "sourceMessageId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "stageExecutionId": {
+          "type": "uuid",
+          "values": [],
+          "maxBytes": null
+        },
+        "targetLanguages": {
+          "type": "string-array",
+          "values": [],
+          "maxBytes": null
+        },
+        "traceparent": {
+          "type": "traceparent",
+          "values": [],
+          "maxBytes": null
+        },
+        "tracestate": {
+          "type": "string",
+          "values": [],
+          "maxBytes": 512
+        }
+      }
+    }
+  }
+}

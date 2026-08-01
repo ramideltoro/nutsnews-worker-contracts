@@ -106,6 +106,28 @@ describe("stage payload schemas and fixtures", () => {
     }
   });
 
+  it("defines the canonical article candidate as a fetcher-to-canonicalizer payload", () => {
+    const definition = STAGE_PAYLOAD_SCHEMA_DEFINITIONS[STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate];
+    const fixture = STAGE_PAYLOAD_FIXTURES.find((candidate) => candidate.name === "canonical-candidate-new-from-fetcher");
+
+    expect(definition).toMatchObject({
+      stage: "canonicalization",
+      producer: "fetcher",
+      consumer: "canonicalizer"
+    });
+    expect(fixture).toBeDefined();
+
+    if (fixture !== undefined) {
+      expect(validateStagePayload(fixture.payload)).toMatchObject({
+        ok: true,
+        definition: {
+          producer: "fetcher",
+          consumer: "canonicalizer"
+        }
+      });
+    }
+  });
+
   it("rejects invalid enrichment request reasons", () => {
     const fixture = STAGE_PAYLOAD_FIXTURES.find((candidate) => candidate.name === "enrichment-request-new");
 

@@ -4,6 +4,7 @@ import {
 } from "./topology.js";
 
 export const STAGE_PAYLOAD_SCHEMA_VERSION = 1 as const;
+export const DEFAULT_PAYLOAD_STRING_MAX_BYTES = 512 as const;
 
 export const STAGE_PAYLOAD_SCHEMA_IDS = {
   feedFetchRequest: "nutsnews.worker.payload.feed-fetch-request.v1",
@@ -196,7 +197,7 @@ export const STAGE_PAYLOAD_SCHEMA_DEFINITIONS = {
     itemRefs: objectArrayField("Small candidate references emitted by the parser."),
     errorRef: objectField("Sanitized error reference for failed fetches.")
   }),
-  [STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate]: schema(STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate, "canonicalization", "canonicalizer", "enrichment", "Carry canonical URL and dedupe decision without article body.", [
+  [STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate]: schema(STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate, "canonicalization", "fetcher", "canonicalizer", "Carry a fetcher-owned canonicalization candidate without article body.", [
     "candidateId",
     "feedId",
     "sourceItemId",
@@ -631,7 +632,7 @@ function validateString(
   path: string,
   issues: StagePayloadValidationIssue[]
 ): void {
-  const maxBytes = definition.maxBytes ?? 512;
+  const maxBytes = definition.maxBytes ?? DEFAULT_PAYLOAD_STRING_MAX_BYTES;
 
   if (typeof value !== "string" || value.length === 0 || utf8ByteLength(value) > maxBytes) {
     issues.push(issue(path, "invalid-field", `${path} must be a bounded non-empty string.`));
@@ -729,7 +730,7 @@ function hasOwn(record: Readonly<Record<string, unknown>>, key: string): boolean
 }
 
 function isSafeUrl(value: string): boolean {
-  if (utf8ByteLength(value) > 2_048) {
+  if (utf8ByteLength(value) > WORKER_MESSAGE_LIMITS.maxPayloadReferenceUriBytes) {
     return false;
   }
 

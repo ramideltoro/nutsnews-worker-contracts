@@ -9,6 +9,7 @@ Deprecation window: `90` days from release unless a security response explicitly
 | `0.3.0` | supported | `2026-10-21` | bootstrap metadata; RabbitMQ topology and envelope; stage payload schemas and fixtures | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.3.0 |
 | `0.3.1` | supported | `2026-10-21` | bootstrap metadata; RabbitMQ topology and envelope; stage payload schemas and fixtures; compatibility and conformance tooling | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.3.1 |
 | `0.4.0` | supported | `2026-10-23` | bootstrap metadata; RabbitMQ topology and envelope; stage payload schemas and fixtures; compatibility and conformance tooling | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v0.4.0 |
+| `1.0.0` | supported | `2026-10-30` | bootstrap metadata; RabbitMQ topology and envelope; corrected stage payload ownership; compatibility and conformance tooling | `bootstrap-metadata-v1`; `rabbitmq-topology-envelope-v1`; `stage-payload-v1` | https://github.com/ramideltoro/nutsnews-worker-contracts/releases/tag/v1.0.0 |
 
 ## Compatibility Rules
 
@@ -32,7 +33,7 @@ Breaking changes require a major version bump and migration notes in `docs/migra
 
 ## CI Enforcement
 
-`npm run compatibility:check` compares the current built contract metadata against `docs/compatibility/contract-snapshot.v0.3.0.json`.
+`npm run compatibility:check` compares the current built contract metadata against the applicable frozen baselines under `docs/compatibility/`. It uses prior baselines in the current major, or the newest lower major when validating a new major, so an admitted old-major break does not force bogus migration notes on later compatible releases. Version `1.0.0` adds a normalized v2 baseline containing the payload schema version, global serialized-payload limit, and each field's required state, type, enum values, and effective byte limit. Legacy v1 snapshots remain readable for historical topology and field-presence checks.
 
 CI fails when it detects a breaking change unless:
 
