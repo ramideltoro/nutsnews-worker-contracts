@@ -44,7 +44,7 @@
   },
   "packageManager": "npm@11.13.0",
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
+    "@eslint/js": "^10.0.1",
     "eslint": "^9.32.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
