@@ -70,6 +70,17 @@ export const STAGE_PAYLOAD_FIXTURES = [
     unchangedReason: "etag-match",
     itemRefs: []
   })),
+  fixture("canonical-candidate-new-from-fetcher", "service-input-output", "The fetcher publishes a bounded candidate for canonicalizer-owned normalization and dedupe work.", payload(STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate, {
+    candidateId: "cand-001",
+    feedId: "feed-world",
+    sourceItemId: "guid-001",
+    originalUrl: "https://articles.example.test/world/story-001?utm_source=fixture",
+    canonicalUrl: "https://articles.example.test/world/story-001",
+    title: "Synthetic world story",
+    sourceName: "Example Feed",
+    publishedAt: "2026-07-23T04:35:00.000Z",
+    dedupeStatus: "new"
+  })),
   fixture("canonical-candidate-duplicate", "duplicate", "Previously reviewed or published URLs are skipped before AI review.", payload(STAGE_PAYLOAD_SCHEMA_IDS.canonicalArticleCandidate, {
     candidateId: "cand-duplicate-001",
     feedId: "feed-world",

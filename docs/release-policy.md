@@ -28,6 +28,7 @@ See [compatibility-matrix.md](compatibility-matrix.md) for supported versions, f
 6. Confirm a fresh consumer install can resolve the exact published version through the `@ramideltoro` GitHub Packages scope.
 7. Run the `Package Install Smoke` workflow with the exact published version and confirm it installs and imports the package using repository `GITHUB_TOKEN` package-read permissions.
 8. For compatibility or schema changes, confirm `npm run compatibility:check` passed and the compatibility matrix was updated.
+9. Freeze a compatibility snapshot for each major contract baseline with `node scripts/write-compatibility-snapshot.mjs <version> <captured-at-utc>`, and include it before any later contract change is accepted.
 
 Manual `workflow_dispatch` publish runs are allowed only for rerunning the same source version after an infrastructure failure before the version has been published.
 
@@ -36,7 +37,7 @@ Manual `workflow_dispatch` publish runs are allowed only for rerunning the same 
 The publish workflow:
 
 - grants `packages: write`, `id-token: write`, and `attestations: write` only to the publish job;
-- runs `npm ci` and the full package CI before publishing;
+- runs `npm ci --ignore-scripts` and the full package CI before publishing so the package-write token is not exposed to dependency lifecycle scripts;
 - rejects release tags that do not match `package.json`;
 - rejects already-published versions;
 - packs the tarball before publishing;

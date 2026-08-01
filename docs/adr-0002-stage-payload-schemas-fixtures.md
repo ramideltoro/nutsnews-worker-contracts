@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for package version `0.3.0`.
+Accepted for package version `0.3.0`; amended in `1.0.0` to correct canonical article candidate ownership to the fetcher-to-canonicalizer boundary.
 
 ## Context
 
@@ -33,7 +33,7 @@ Every stage payload carries these fields:
 | --- | --- | --- | --- | --- |
 | `nutsnews.worker.payload.feed-fetch-request.v1` | `scheduler` | `fetcher` | `feedId`, `feedUrl`, `shardIndex`, `shardCount`, `fetchReason`, `limits` | Preserves live shard count/cadence evidence and bounded fetch limits. |
 | `nutsnews.worker.payload.feed-fetch-result.v1` | `fetcher` | `canonicalizer` | `feedId`, `feedUrl`, `fetchStatus`, `itemRefs` | Preserves success, unchanged feed, malformed feed, timeout, and sanitized feed health outcomes. |
-| `nutsnews.worker.payload.canonical-article-candidate.v1` | `canonicalizer` | `enrichment` | `candidateId`, `feedId`, `sourceItemId`, `originalUrl`, `canonicalUrl`, `title`, `sourceName`, `dedupeStatus` | Preserves original URL normalization and duplicate suppression before expensive work. |
+| `nutsnews.worker.payload.canonical-article-candidate.v1` | `fetcher` | `canonicalizer` | `candidateId`, `feedId`, `sourceItemId`, `originalUrl`, `canonicalUrl`, `title`, `sourceName`, `dedupeStatus` | Preserves the fetcher-to-canonicalizer candidate handoff, original URL normalization, and duplicate suppression before expensive work. |
 | `nutsnews.worker.payload.enrichment-request.v1` | `canonicalizer` | `enrichment` | `requestId`, `canonicalArticleId`, `articleVersion`, `candidateId`, `canonicalUrl`, `reason`, `payloadRef` | Requests article-page enrichment for new or materially changed canonical identities without carrying page bodies. |
 | `nutsnews.worker.payload.enrichment-result.v1` | `enrichment` | `approval` | `candidateId`, `canonicalUrl`, `imageStatus`, `articleMetadataRef` | Preserves article-page image lookup and no-thumbnail behavior by reference. |
 | `nutsnews.worker.payload.approval-decision.v1` | `approval` | `translation` | `candidateId`, `decision`, `provider`, `model`, `reviewRef` | Preserves local prefilter, local AI review metadata, rejection reasons, and structured failure handling. |
